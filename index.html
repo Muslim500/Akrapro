@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>АкраПро · Склад</title>
+<meta name="description" content="Склад автохимии АкраПро">
+<meta name="theme-color" content="#0F1826">
+<meta name="apple-mobile-web-app-title" content="АкраПро">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script>
+  // Адрес рабочего приложения склада (Google Apps Script)
+  var APP = "https://script.google.com/macros/s/AKfycbyyZruijVrkWkG7M3F72YdARyUPIMr5Y9tA4Kv32TVw729IjkMDDgRPRC3UqDHhd8og8g/exec";
+  (function () {
+    var nav = (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]) || {};
+    var back = nav.type === "back_forward";
+    var fromIcon = /[?&]app=1\b/.test(location.search) ||
+      (window.matchMedia && matchMedia("(display-mode: standalone)").matches) ||
+      window.navigator.standalone === true;
+    if (fromIcon && !back) { document.documentElement.className = "go"; location.replace(APP); }
+  })();
+</script>
+<style>
+  :root{--bg:#0F1826;--card:#16213A;--ink:#FFFFFF;--muted:#9AA7BD;--red:#FF0009;--line:#26334D}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+    font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  main{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:28px;padding:calc(32px + env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));text-align:center}
+  .logo{width:min(260px,70vw);height:auto}
+  .sub{margin:-14px 0 0;color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+  .btn{display:block;width:min(320px,100%);padding:16px 20px;border-radius:14px;background:var(--red);color:#fff;
+    font-weight:700;font-size:18px;text-decoration:none;box-shadow:0 8px 24px rgba(255,0,9,.25)}
+  .btn:active{transform:translateY(1px);filter:brightness(.95)}
+  .how{width:min(420px,100%);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-align:left}
+  .how h2{margin:0 0 10px;font-size:15px}
+  .how ol{margin:0;padding-left:20px;color:var(--muted);font-size:14px}
+  .how li{margin:4px 0}
+  .how b{color:var(--ink);font-weight:600}
+  .tabs{display:flex;gap:6px;margin-bottom:12px}
+  .tabs button{flex:1;padding:8px;border-radius:9px;border:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:14px}
+  .tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+  .wait{display:none;color:var(--muted)}
+  .go .btn,.go .how,.go .sub{display:none}
+  .go .wait{display:block}
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="logo.png" alt="AkraPro" width="344" height="174">
+  <p class="sub">Склад автохимии</p>
+  <p class="wait">Открываю склад…</p>
+  <a class="btn" id="open" href="#">Открыть склад</a>
+
+  <section class="how" aria-label="Как установить на телефон">
+    <h2>Значок на экран телефона</h2>
+    <div class="tabs" role="tablist">
+      <button type="button" data-t="ios" role="tab">iPhone</button>
+      <button type="button" data-t="and" role="tab">Android</button>
+    </div>
+    <ol data-p="ios">
+      <li>Откройте эту страницу в <b>Safari</b>.</li>
+      <li>Нажмите <b>«Поделиться»</b> (квадрат со стрелкой вверх).</li>
+      <li>Выберите <b>«На экран „Домой“»</b> → <b>«Добавить»</b>.</li>
+    </ol>
+    <ol data-p="and" hidden>
+      <li>Откройте эту страницу в <b>Chrome</b>.</li>
+      <li>Нажмите <b>⋮</b> в правом верхнем углу.</li>
+      <li>Выберите <b>«Добавить на главный экран»</b>.</li>
+    </ol>
+  </section>
+</main>
+<script>
+  document.getElementById("open").href = APP;
+  // Значок на экране «Домой» сохраняет текущий адрес — помечаем его, чтобы с иконки склад открывался сразу
+  if (!/[?&]app=1\b/.test(location.search)) { try { history.replaceState(null, "", "?app=1"); } catch (e) {} }
+  var isAndroid = /android/i.test(navigator.userAgent);
+  function show(t){
+    document.querySelectorAll(".tabs button").forEach(function(b){ b.classList.toggle("on", b.dataset.t === t); b.setAttribute("aria-selected", b.dataset.t === t); });
+    document.querySelectorAll("[data-p]").forEach(function(p){ p.hidden = p.dataset.p !== t; });
+  }
+  document.querySelectorAll(".tabs button").forEach(function(b){ b.onclick = function(){ show(b.dataset.t); }; });
+  show(isAndroid ? "and" : "ios");
+  window.addEventListener("pageshow", function(e){ if (e.persisted) document.documentElement.className = ""; });
+</script>
+</body>
+</html>
